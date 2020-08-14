@@ -42,7 +42,7 @@ function buildHeader() {
   link.id = 'contactLink';
   link.className = 'linkButton';
 
-  let text = document.createTextNode('Contact');
+  text = document.createTextNode('Contact');
   link.appendChild(text);
   contItem.appendChild(link);
   container.appendChild(contItem);
@@ -126,31 +126,6 @@ function buildAd() {
   mainAd.appendChild(container);
 }
 
-// *** sortMenu **
-function buildSortMenu() {
-  let sortMenu = document.querySelector('#sortMenu');
-
-  let container = document.createElement('div');
-  container.id = 'sortContainer';
-  container.className = 'sortContainer';
-
-  let paraSort = document.createElement('p');
-  paraSort.id = 'paraSort';
-  paraSort.className = 'paraSort';
-
-  let link = document.createElement('a');
-  link.href = '#';
-  link.id = 'linkSort';
-  link.className = 'linkButton';
-  link.onclick = 'sortByPrice();';
-
-  let text = document.createTextNode('List by Price');
-  link.appendChild(text);
-  paraSort.appendChild(link);
-  container.appendChild(paraSort);
-  sortMenu.appendChild(container);
-}
-
 // *** productList ***
 function buildProductList(type) {
   let productList = document.querySelector('#productList');
@@ -209,9 +184,10 @@ function buildRightFooter() {
   form.appendChild(emailLabel);
 
   let emailInput = document.createElement('input');
-  emailInput.type = 'text';
+  emailInput.type = 'email';
   emailInput.id = 'fEmail';
   emailInput.name = 'fEmail';
+  emailInput.required = true;
   emailInput.placeholder = 'Enter your email';
   form.appendChild(emailInput);
 
@@ -232,6 +208,7 @@ function buildContact() {
   form.id = 'formContact';
   form.action = 'https://httpbin.org/post';
   form.method = 'POST';
+  form.setAttribute('onsubmit', 'return validateForm()');
 
   // first name
   let label = document.createElement('label');
@@ -444,9 +421,10 @@ function buildContact() {
 
   inputText = document.createElement('input');
   inputText.type = 'radio';
-  inputText.id = 'contactReason';
+  inputText.id = 'Question';
   inputText.name = 'contactReason';
   inputText.value = 'Question';
+  inputText.setAttribute('onchange', 'checkProblem()');
   form.appendChild(inputText);
 
   label = document.createElement('label');
@@ -457,9 +435,10 @@ function buildContact() {
 
   inputText = document.createElement('input');
   inputText.type = 'radio';
-  inputText.id = 'contactReason';
+  inputText.id = 'Comment';
   inputText.name = 'contactReason';
   inputText.value = 'Comment';
+  inputText.setAttribute('onchange', 'checkProblem()');
   form.appendChild(inputText);
 
   label = document.createElement('label');
@@ -470,9 +449,10 @@ function buildContact() {
 
   inputText = document.createElement('input');
   inputText.type = 'radio';
-  inputText.id = 'contactReason';
+  inputText.id = 'Problem';
   inputText.name = 'contactReason';
   inputText.value = 'Problem';
+  inputText.setAttribute('onchange', 'checkProblem()');
   form.appendChild(inputText);
 
   label = document.createElement('label');
@@ -487,6 +467,7 @@ function buildContact() {
   form.appendChild(lineBreak);
 
   label = document.createElement('label');
+  label.id = 'labelInputOrder';
   label.for = 'inputOrder';
   label.hidden = true;
   text = document.createTextNode('Order Number:   ');
@@ -544,12 +525,12 @@ function buildContact() {
   send.type = 'submit';
   send.className = 'linkButton';
   send.value = 'Send';
-  send.setAttribute('onsubmit', 'validateForm()');
   form.appendChild(send);
 
   mainContact.appendChild(form);
 }
 
+// check form
 function validateForm() {
   // valid phone
   let phone = document.querySelector('#inputPhone').value;
@@ -564,6 +545,55 @@ function validateForm() {
   return validPhone && validPostal;
 }
 
+// check order
+function checkProblem() {
+  let checkBox = document.querySelector('#Problem').checked;
+  let oNoL = document.querySelector('#labelInputOrder');
+  let oNo = document.querySelector('#inputOrder');
+
+  if (checkBox) {
+    oNoL.hidden = false;
+    oNo.hidden = false;
+    oNo.required = true;
+  } else {
+    oNoL.hidden = true;
+    oNo.hidden = true;
+    oNo.required = false;
+  }
+}
+
+// check screen size to adapt layout
+function screenSize() {
+  var screenWidth = document.documentElement.clientWidth;
+  var isMobile = false;
+  if (
+    /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    screenWidth < '800'
+  ) {
+    isMobile = true;
+  }
+
+  let menu = document.querySelector('.linkButton');
+  let headerDesc = document.querySelector('.centerHeader');
+  let headerDesc1 = document.querySelector('#descM');
+  let leftMenu = document.querySelector('#leftMenu');
+  if (isMobile) {
+    leftMenu.hidden = true;
+    headerDesc.style.fontSize = '10pt';
+    headerDesc1.style.fontsize = '7pt;';
+    menu.style.fontsize = '0.5em';
+    menu.style.paddingLeft = '10px';
+    menu.style.paddingRight = '10px';
+  } else {
+    leftMenu.hidden = false;
+    headerDesc.style.fontSize = '17pt';
+    headerDesc1.style.fontsize = '14pt;';
+    menu.style.fontsize = '1em';
+    menu.style.paddingLeft = '30px';
+    menu.style.paddingRight = '30px';
+  }
+}
+
 function loadIndex() {
   // create header
   buildHeader();
@@ -575,20 +605,22 @@ function loadIndex() {
   // create left menu
   buildMenu('leftMenu');
 
-  // create sort menu
-  buildSortMenu();
-
   // create product list
   buildProductList('all');
 
   // create footer
   buildLeftFooter();
   buildRightFooter();
+
+  screenSize();
 }
 
 function loadContacts() {
   // create header
   buildHeader();
+  let homeLink = document.querySelector('#contactLink');
+  homeLink.href = 'index.html';
+  homeLink.innerHTML = 'Home';
 
   // create form
   buildContact();
@@ -596,4 +628,6 @@ function loadContacts() {
   // create footer
   buildLeftFooter();
   buildRightFooter();
+
+  screenSize();
 }
